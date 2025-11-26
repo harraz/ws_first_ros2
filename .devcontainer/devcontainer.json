@@ -79,12 +79,12 @@
 
       "extensions": [
         "ms-vscode-remote.remote-containers",
-        "ms-iot.vscode-ros",
         "ms-python.python",
         "ms-vscode.cpptools",
         "ms-vscode.cmake-tools",
         "eamodio.gitlens"
       ]
+
     }
   },
 

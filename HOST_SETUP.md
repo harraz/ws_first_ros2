@@ -1,168 +1,165 @@
-# Host Setup for ROS2 Iron + Docker + VS Code (X11 Enabled)
+# Host Setup – Debian + Docker + X11 + ROS2 GUI
 
-This document records everything required on the **host system** to run ROS2 Iron + GUI tools (rviz2, rqt, xeyes) successfully inside Docker and VS Code Dev Containers.
+This document captures ALL host-side requirements and fixes needed to run
+ROS2 Iron inside Docker with full X11 GUI (rviz2, rqt, xeyes, Gazebo, etc).
 
-This setup has been validated on:
+This setup was built and verified on:
+- Debian (Docker from Debian repo – running as root)
+- VS Code + Dev Containers
+- ROS2 Iron (osrf/ros:iron-desktop based)
 
-- Debian Linux host
-- Docker running as root
-- ROS2 Iron containers based on `osrf/ros:iron-desktop`
-- VS Code Dev Containers extension
-- X11 applications forwarding correctly
+This file prevents you from having to rediscover the same gotchas.
 
+--------------------------------------------------
+1. Verify Docker is working
+--------------------------------------------------
 
-------------------------------------------------------------
-1. Docker Install (Debian)
-------------------------------------------------------------
+docker --version
+docker info
 
-If Docker was installed using the Debian package, it may **not** create a `docker` group automatically.
-
-Check group:
-
-    getent group docker
-
-If missing, create it:
-
-    sudo groupadd docker
-    sudo usermod -aG docker $USER
-
-Confirm membership:
-
-    getent group docker
-
-Expected output:
-
-    docker:x:994:harraz
-
-Logout/login after this step.
+Make sure Docker is running and does NOT error.
 
 
-------------------------------------------------------------
-2. X11 Host Configuration
-------------------------------------------------------------
+--------------------------------------------------
+2. Ensure docker group exists
+--------------------------------------------------
 
-Allow Docker containers to access your display:
+On Debian, Docker does NOT always create the docker group.
 
-    xhost +local:
+sudo groupadd docker   # if it does not exist
+sudo usermod -aG docker $USER
+newgrp docker
 
-Verify socket:
+Verify:
+getent group docker
 
-    ls /tmp/.X11-unix
-
-Expected:
-
-    X0  X1
-
-
-------------------------------------------------------------
-3. Required Test Packages
-------------------------------------------------------------
-
-Install on host:
-
-    sudo apt install -y x11-apps
-
-Test:
-
-    xeyes
-
-You should see eyes pop up.
+You should see something like:
+docker:x:994:harraz
 
 
-------------------------------------------------------------
-4. Docker X11 Test
-------------------------------------------------------------
+--------------------------------------------------
+3. Test Docker WITHOUT sudo
+--------------------------------------------------
 
-Verify container-to-display access:
+docker run hello-world
 
-    docker run -it --rm \
-      --net=host \
-      -e DISPLAY=$DISPLAY \
-      -v /tmp/.X11-unix:/tmp/.X11-unix \
-      ubuntu:22.04 bash
-
-Inside container:
-
-    apt update
-    apt install -y x11-apps
-    xeyes
-
-If it works → X11 is correct ✔️
+If this works, continue.
 
 
-------------------------------------------------------------
-5. ROS2 Image Used (IMPORTANT)
-------------------------------------------------------------
+--------------------------------------------------
+4. Enable X11 access for Docker
+--------------------------------------------------
 
-Official ROS Docker guide is misleading for GUI.
+This is REQUIRED each time you reboot:
 
-Correct base:
+xhost +local:docker
 
-    osrf/ros:iron-desktop
-
-Your published image:
-
-    harraztendo/ros2-iron-dev:latest
-
-Includes:
-- rviz2
-- rqt
-- ROS2 CLI
-- Python3 / pip
-- X11/OpenGL
+You must see:
+"local:docker being added to access control list"
 
 
-------------------------------------------------------------
-6. Required Runtime Variables
-------------------------------------------------------------
+--------------------------------------------------
+5. Test X11 using xeyes (Docker → Host)
+--------------------------------------------------
 
-    export ROS_DOMAIN_ID=42
-    export QT_X11_NO_MITSHM=1
+docker run -it --rm \
+  -e DISPLAY=$DISPLAY \
+  -v /tmp/.X11-unix:/tmp/.X11-unix \
+  x11-apps xeyes
 
-
-------------------------------------------------------------
-7. Correct DevContainer Flags
-------------------------------------------------------------
-
-Must include:
-
-    "--net=host"
-    "-e DISPLAY=${env:DISPLAY}"
-    "-v /tmp/.X11-unix:/tmp/.X11-unix"
+You should see moving eyes appear.
 
 
-------------------------------------------------------------
-8. Final Test Command
-------------------------------------------------------------
+--------------------------------------------------
+6. Test ROS2 GUI directly from Docker
+--------------------------------------------------
 
-    docker run -it --rm \
-     --net=host \
-     -e DISPLAY=$DISPLAY \
-     -e ROS_DOMAIN_ID=42 \
-     -e QT_X11_NO_MITSHM=1 \
-     -v /tmp/.X11-unix:/tmp/.X11-unix \
-     harraztendo/ros2-iron-dev:latest bash
+docker run -it --rm \
+  --net=host \
+  -e DISPLAY=$DISPLAY \
+  -v /tmp/.X11-unix:/tmp/.X11-unix \
+  osrf/ros:iron-desktop \
+  rviz2
 
-Inside:
-
-    xeyes
-    rviz2
-    ros2 topic list
+If RVIZ2 opens, the system is ready ✅
 
 
-------------------------------------------------------------
-WARNING ABOUT OFFICIAL GUIDE
-------------------------------------------------------------
+--------------------------------------------------
+7. Docker cleanup (when VS Code gets confused)
+--------------------------------------------------
 
-This is misleading for Iron + GUI:
+Use this when containers/images get corrupted:
+
+docker system prune -a --volumes
+docker network prune
+docker volume prune
+
+Restart Docker:
+
+sudo systemctl restart docker
+
+
+--------------------------------------------------
+8. Emergency reset (nuclear option)
+--------------------------------------------------
+
+docker stop $(docker ps -aq) 2>/dev/null
+docker rm -f $(docker ps -aq) 2>/dev/null
+docker rmi -f $(docker images -q) 2>/dev/null
+
+
+--------------------------------------------------
+9. Important note about ROS Docs
+--------------------------------------------------
+
+THIS DOCUMENT IS MISLEADING for building ROS in VScode and Docker:
 
 https://docs.ros.org/en/foxy/How-To-Guides/Setup-ROS-2-with-VSCode-and-Docker-Container.html
 
 Problems:
-- Minimal image (no GUI)
-- No X11 forwarding
-- Wrong .devcontainer placement
-- Outdated extensions
+- Wrong image
+- No X11 GUI support
+- Old VS Code extensions
+- Wrong .devcontainer structure
 
-Use YOUR image instead.
+This repo replaces that with a working setup.
 
+
+--------------------------------------------------
+10. Approved VS Code extensions (NOT deprecated)
+--------------------------------------------------
+
+KEEP:
+- ms-vscode-remote.remote-containers
+- ms-python.python
+- ms-vscode.cpptools
+- ms-vscode.cmake-tools
+- eamodio.gitlens (optional)
+
+REMOVE (deprecated):
+- ms-iot.vscode-ros
+
+VS Code may show:
+"Develop Robot Operating System (ROS)... is deprecated"
+Ignore and use the above instead.
+
+
+--------------------------------------------------
+11. Summary Checklist ✅
+--------------------------------------------------
+
+Docker installed: ✅
+User in docker group: ✅
+xhost configured: ✅
+xeyes works: ✅
+rviz2 works: ✅
+VS Code Dev Container works: ✅
+
+
+--------------------------------------------------
+Maintainer
+--------------------------------------------------
+
+Mohamed Farouk Harraz
+GitHub: https://github.com/harraz
+Email: harraz@gmail.com
