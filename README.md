@@ -27,6 +27,29 @@ This repository provides a **ready-to-use ROS 2 Iron development environment** w
 * VS Code + Dev Container ready
 
 ---
+IMPORTANT WARNING
+
+The official ROS 2 Foxy + VS Code guide is **misleading** for Iron and GUI use.
+
+Do NOT rely on:
+
+https://docs.ros.org/en/foxy/How-To-Guides/Setup-ROS-2-with-VSCode-and-Docker-Container.html
+
+It:
+- Uses minimal images without GUI
+- Has no DISPLAY/X11 forwarding
+- Misses rviz2 / rqt
+- Uses outdated extensions
+- Has incorrect folder locations
+
+Instead, this repo uses:
+
+    harraztendo/ros2-iron-dev:latest
+
+Which is based on:
+
+    osrf/ros:iron-desktop
+---
 
 ## 🖥️ System Requirements
 
