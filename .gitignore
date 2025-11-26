@@ -68,5 +68,5 @@ __pycache__/
 # OS clutter
 .DS_Store
 Thumbs.db
-.bak
+*.bak
 >>>>>>> ec44601 (Add ROS2 Iron DevContainer + Docker + X11 + RViz)
