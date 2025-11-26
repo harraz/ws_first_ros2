@@ -1,0 +1,92 @@
+{
+  "name": "ROS2 Iron Dev - Harraz",
+  "image": "harraztendo/ros2-iron-dev:latest",
+  "init": true,
+
+  "overrideCommand": true,
+  "command": "sleep infinity",
+
+  "privileged": true,
+
+  "workspaceFolder": "/projects/ws_first_ros2",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/projects/ws_first_ros2,type=bind",
+
+  "runArgs": [
+    "--net=host",
+    "-e", "DISPLAY=${env:DISPLAY}",
+    "-v", "/tmp/.X11-unix:/tmp/.X11-unix"
+  ],
+
+  "containerEnv": {
+    "SHELL": "/bin/bash",
+    "ROS_DOMAIN_ID": "42",
+    "QT_X11_NO_MITSHM": "1"
+  },
+
+  "customizations": {
+    "vscode": {
+      "settings": {
+
+        /* Terminal */
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "terminal.integrated.scrollback": 5000,
+
+        /* ROS */
+        "ros.distro": "iron",
+        "ros.rosSetupScript": "/opt/ros/iron/setup.bash",
+
+        /* CMake */
+        "cmake.configureOnOpen": false,
+        "cmake.buildDirectory": "${workspaceFolder}/build",
+
+        /* C++ IntelliSense */
+        "C_Cpp.intelliSenseEngine": "Default",
+        "C_Cpp.default.includePath": [
+          "/opt/ros/iron/include/**",
+          "${workspaceFolder}/install/**",
+          "${workspaceFolder}/src/**"
+        ],
+        "C_Cpp.default.defines": [
+          "ROS_VERSION=2",
+          "ROS_DISTRO_IRON"
+        ],
+
+        /* Python */
+        "python.defaultInterpreterPath": "/usr/bin/python3",
+        "python.terminal.activateEnvironment": false,
+        "python.analysis.extraPaths": [
+          "/opt/ros/iron/lib/python3.10/site-packages",
+          "${workspaceFolder}/install/**/lib/python3.10/site-packages"
+        ],
+
+        /* Performance */
+        "files.watcherExclude": {
+          "**/build/**": true,
+          "**/install/**": true,
+          "**/log/**": true,
+          "**/.git/**": true
+        },
+
+        /* UI / UX */
+        "editor.minimap.enabled": false,
+        "editor.renderWhitespace": "none",
+        "editor.smoothScrolling": true,
+
+        /* Git */
+        "git.autofetch": true,
+        "git.confirmSync": false
+      },
+
+      "extensions": [
+        "ms-vscode-remote.remote-containers",
+        "ms-iot.vscode-ros",
+        "ms-python.python",
+        "ms-vscode.cpptools",
+        "ms-vscode.cmake-tools",
+        "eamodio.gitlens"
+      ]
+    }
+  },
+
+  "postAttachCommand": "bash -c 'source /opt/ros/iron/setup.bash'"
+}
