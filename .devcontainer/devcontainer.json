@@ -87,6 +87,5 @@
 
     }
   },
-
   "postAttachCommand": "bash -c 'source /opt/ros/iron/setup.bash'"
 }
