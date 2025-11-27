@@ -11,11 +11,13 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Tools + Python + X11
 # -------------------------------
 RUN apt-get update && \
+    apt-get upgrade -y && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         bash-completion \
         python3 \
         python3-pip \
         python3-venv \
+        python-colon-autocomplete \
         git \
         curl \
         wget \
@@ -24,6 +26,7 @@ RUN apt-get update && \
         net-tools \
         x11-apps \
         xauth \
+        tree
     && rm -rf /var/lib/apt/lists/*
 
 # -------------------------------
