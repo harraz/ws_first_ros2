@@ -1,18 +1,32 @@
 {
-  "name": "ROS2 Iron Dev - Harraz",
-  "image": "harraztendo/ros2-iron-dev:latest",
-  "init": true,
 
-  "overrideCommand": true,
-  "command": "sleep infinity",
+  // ==================================
+// Dev Container Identity
+// ==================================
+"name": "ROS2 Iron Dev - Harraz",
+"image": "harraztendo/ros2-iron-dev:latest",
 
-  "privileged": true,
+// ==================================
+// Runtime Behavior
+// ==================================
+"init": true,
+"overrideCommand": true,
+"command": "sleep infinity",
+"privileged": true,
 
-  "workspaceFolder": "/projects/ws_first_ros2",
-  "workspaceMount": "source=${localWorkspaceFolder},target=/projects/ws_first_ros2,type=bind",
+// ==================================
+// Workspace
+// ==================================
+"workspaceFolder": "/projects/ws_first_ros2",
+"workspaceMount": "source=${localWorkspaceFolder},target=/projects/ws_first_ros2,type=bind",
 
+// ==================================
+// Docker Runtime Args
+// ==================================
   "runArgs": [
     "--net=host",
+    "sleep", "infinity",
+    "--hostname", "ros2-dev",
     "-e", "DISPLAY=${env:DISPLAY}",
     "-v", "/tmp/.X11-unix:/tmp/.X11-unix"
   ],
