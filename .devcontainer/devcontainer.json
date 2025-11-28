@@ -25,7 +25,6 @@
 // ==================================
   "runArgs": [
     "--net=host",
-    "sleep", "infinity",
     "--hostname", "ros2-dev",
     "-e", "DISPLAY=${env:DISPLAY}",
     "-v", "/tmp/.X11-unix:/tmp/.X11-unix"

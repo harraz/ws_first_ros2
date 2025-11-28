@@ -50,6 +50,12 @@ ENV LC_ALL=en_US.UTF-8
 # ----------------------------------------------------
 RUN pip3 install --no-cache-dir --upgrade pip setuptools wheel
 
+# -------------------------------
+# ROS + Workspace shell setup
+# -------------------------------
+RUN echo "source /opt/ros/iron/setup.bash" >> /root/.bashrc \
+ && echo "if [ -f /projects/ws_first_ros2/install/setup.bash ]; then source /projects/ws_first_ros2/install/setup.bash; fi" >> /root/.bashrc
+
 # ----------------------------------------------------
 # Workspace root
 # ----------------------------------------------------
