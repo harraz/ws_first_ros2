@@ -19,7 +19,6 @@ RUN echo 'Acquire::ForceIPv4 "true";' > /etc/apt/apt.conf.d/99force-ipv4 \
 # System + Dev Tools + Python + X11
 # ----------------------------------------------------
 RUN apt-get update && \
-    apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
         bash-completion \
         python3 \
