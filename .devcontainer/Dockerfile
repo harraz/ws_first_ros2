@@ -19,7 +19,6 @@ RUN echo 'Acquire::ForceIPv4 "true";' > /etc/apt/apt.conf.d/99force-ipv4 \
 # System + Dev Tools + Python + X11
 # ----------------------------------------------------
 RUN apt-get update && \
-    apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
         bash-completion \
         python3 \
@@ -35,7 +34,9 @@ RUN apt-get update && \
         x11-apps \
         xauth \
         tzdata \
-        locales \
+        locales \     
+        mosquitto \
+	    mosquitto-clients \
     && rm -rf /var/lib/apt/lists/*
 
 # ----------------------------------------------------
@@ -49,6 +50,13 @@ ENV LC_ALL=en_US.UTF-8
 # Python tooling
 # ----------------------------------------------------
 RUN pip3 install --no-cache-dir --upgrade pip setuptools wheel
+RUN pip3 install paho-mqtt
+
+# -------------------------------
+# ROS + Workspace shell setup
+# -------------------------------
+RUN echo "source /opt/ros/iron/setup.bash" >> /root/.bashrc \
+ && echo "if [ -f /projects/ws_first_ros2/install/setup.bash ]; then source /projects/ws_first_ros2/install/setup.bash; fi" >> /root/.bashrc
 
 # ----------------------------------------------------
 # Workspace root
