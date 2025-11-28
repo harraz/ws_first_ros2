@@ -34,7 +34,9 @@ RUN apt-get update && \
         x11-apps \
         xauth \
         tzdata \
-        locales \
+        locales \     
+        mosquitto \
+	    mosquitto-clients \
     && rm -rf /var/lib/apt/lists/*
 
 # ----------------------------------------------------
@@ -48,6 +50,7 @@ ENV LC_ALL=en_US.UTF-8
 # Python tooling
 # ----------------------------------------------------
 RUN pip3 install --no-cache-dir --upgrade pip setuptools wheel
+RUN pip3 install paho-mqtt
 
 # -------------------------------
 # ROS + Workspace shell setup
